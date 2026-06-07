@@ -1,0 +1,10 @@
+# Copy to your Vita as: ux0:data/vitaspotify/dev_login.txt
+# Never commit dev_login.txt or paste real passwords into git/chat.
+#
+# Option A — two lines (profile name first, then password):
+# MySpotifyProfileName
+# your_password_here
+#
+# Option B — key=value:
+profile_name=MySpotifyProfileName
+password=your_password_here

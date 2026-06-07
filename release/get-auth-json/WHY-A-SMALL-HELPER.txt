@@ -1,0 +1,16 @@
+Why is there a small .exe / helper program in the zip?
+======================================================
+
+Spotify Connect login is not a normal username/password web page. It needs
+network discovery, a local web server, and encrypted talks with Spotify's
+servers. A plain .bat file cannot do that by itself.
+
+So each platform folder includes:
+  • A script you double-click (.bat / .command / .sh)
+  • A small helper program next to it (~1 MB)
+
+You only run the script. The helper sits in the same folder — nothing to
+install, no git, no coding.
+
+The .bat is not a replacement for the helper; it launches the helper and
+shows you the steps.

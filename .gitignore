@@ -1,0 +1,19 @@
+build/
+build-host/
+*.vpk
+*.suprx
+.vscode/
+.DS_Store
+.cache-auth-test/
+outputFifo
+
+# Secrets — never commit
+dev_login.txt
+**/dev_login.txt
+auth.json
+**/auth.json
+
+# Local build outputs (helpers are copied into release/ when packing)
+release/get-auth-json/mac/vitaspotify-auth-helper
+release/get-auth-json/linux/vitaspotify-auth-helper
+release/get-auth-json/windows/vitaspotify-auth-helper.exe

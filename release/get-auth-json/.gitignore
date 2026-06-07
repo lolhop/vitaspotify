@@ -1,0 +1,4 @@
+# Helpers are bundled in release zips; optional to commit for convenience.
+# mac/vitaspotify-auth-helper
+# linux/vitaspotify-auth-helper
+# windows/vitaspotify-auth-helper.exe

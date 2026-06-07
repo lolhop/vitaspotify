@@ -1,0 +1,16 @@
+// Spotify storage-resolve response (from librespot protocol)
+syntax = "proto2";
+
+package spotify.download.proto;
+
+message StorageResolveResponse {
+    optional Result result = 1;
+    enum Result {
+        CDN = 0;
+        STORAGE = 1;
+        RESTRICTED = 3;
+    }
+
+    repeated string cdnurl = 2;
+    optional bytes fileid = 4;
+}

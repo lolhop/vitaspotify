@@ -1,0 +1,2 @@
+spotify.download.proto.StorageResolveResponse.cdnurl max_count:8,max_length:512
+spotify.download.proto.StorageResolveResponse.fileid max_size:32
