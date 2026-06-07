@@ -4,6 +4,17 @@ Spotify Connect client for jailbroken PS Vita. Stream your library, browse playl
 
 **Requires Spotify Premium.** Unofficial client — use at your own risk.
 
+## Get the project (Windows / Mac / Linux)
+
+```bash
+git clone https://github.com/lolhop/vitaspotify.git
+cd vitaspotify
+```
+
+On Windows, build the auth helper (see `docs/BUILD-AUTH-HELPER.md`), copy `cspotcli.exe` to  
+`release/get-auth-json/windows/vitaspotify-auth-helper.exe`, then run  
+`release/get-auth-json/windows/Get VitaSpotify Login.bat`.
+
 ## Release install (users)
 
 1. Install **[iTLS-Enso](https://github.com/CelesteBlue-dev/ITLS-Enso)** on your Vita.
