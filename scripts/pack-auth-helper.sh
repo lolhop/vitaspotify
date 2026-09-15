@@ -77,13 +77,15 @@ rm -f "$OUT_ZIP"
   cd "$RELEASE_DIR/.."
   zip -r "$OUT_ZIP" get-auth-json \
     -x "get-auth-json/.gitignore" \
-    -x "get-auth-json/*/.DS_Store"
+    -x "get-auth-json/*/.DS_Store" \
+    -x "get-auth-json/*/outputFifo" \
+    -x "get-auth-json/mac/.helper-build-id"
 )
 
 echo ""
 echo "Packed: $OUT_ZIP"
 echo ""
-if ! check_bundled_helpers; then
+if check_bundled_helpers; then
   echo ""
   echo "Zip is complete for all platforms."
 else

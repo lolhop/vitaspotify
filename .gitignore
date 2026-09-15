@@ -1,5 +1,7 @@
 build/
 build-host/
+build-host-arm/
+build-host-x64/
 *.vpk
 *.suprx
 .vscode/
@@ -17,3 +19,6 @@ auth.json
 release/get-auth-json/mac/vitaspotify-auth-helper
 release/get-auth-json/linux/vitaspotify-auth-helper
 release/get-auth-json/windows/vitaspotify-auth-helper.exe
+release/get-auth-json/mac/.helper-build-id
+release/get-auth-json/mac/lib/
+release/get-auth-json/mac/VitaSpotify Login.app/

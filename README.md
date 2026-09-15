@@ -1,145 +1,151 @@
 # VitaSpotify
 
-Spotify Connect client for jailbroken PS Vita. Stream your library, browse playlists, search, download tracks for offline playback, and more — built on [cspot](https://github.com/feelfreelinux/cspot).
+VitaSpotify is a Spotify Connect client for the PlayStation Vita. It lets a
+jailbroken Vita show up as a Spotify device, play music, browse playlists and
+search results, and save tracks for offline playback.
 
-**Requires Spotify Premium.** Unofficial client — use at your own risk.
+This is unofficial homebrew and requires Spotify Premium. It is built on
+[cspot](https://github.com/feelfreelinux/cspot).
 
-## Get the project (Windows / Mac / Linux)
+## What Works
+
+- Login with an `auth.json` file generated on your computer
+- Now Playing controls
+- Liked Songs, playlists, search, and direct Spotify links
+- Track and playlist downloads for offline playback
+- Local playback for downloaded tracks without signing in again
+
+## Install
+
+1. Install a current TLS setup on the Vita, such as
+   [iTLS-Enso](https://github.com/CelesteBlue-dev/ITLS-Enso).
+2. Install `vitaspotify.vpk` with VitaShell.
+3. On your computer, unzip `VitaSpotify-auth-helper.zip`.
+4. Run the helper for your OS:
+   - macOS: `mac/Get VitaSpotify Login.command`
+   - Windows: `windows/Get VitaSpotify Login.bat`
+   - Linux: `linux/get-vitaspotify-login.sh`
+5. In the Spotify app, play anything, open Connect to a device, and choose
+   `CSpot player`.
+6. Copy the generated login file to the Vita as:
+
+```text
+ux0:data/vitaspotify/auth.json
+```
+
+Launch VitaSpotify and choose `Log in (auth.json)`.
+
+Keep `auth.json` private. It is a saved Spotify login file, not a config file to
+share in issues, screenshots, or chat logs.
+
+The longer auth guide is in [docs/AUTH.md](docs/AUTH.md).
+
+## Controls
+
+- D-pad: move through lists and controls
+- Cross: select
+- Touch: tap playback controls
+- L/R: page through downloads, playlists, and search results
+- START + SELECT: quit cleanly
+
+Use the in-app `Go offline` option to disconnect Spotify and play saved tracks.
+
+## Build
+
+You need VitaSDK and the Vita packages used by the app:
+
+```bash
+vdpm -f mbedtls zstd curl openssl freetype vitaGL imgui vitaShaRK taihen SceShaccCgExt libmathneon zlib
+```
+
+On macOS, install the host tools:
+
+```bash
+brew install cmake wget protobuf@21
+python3 -m pip install 'setuptools<70' 'protobuf>=3.19,<5'
+```
+
+On Debian/Ubuntu or WSL:
+
+```bash
+sudo apt install build-essential cmake wget protobuf-compiler python3-protobuf
+```
+
+Then build:
 
 ```bash
 git clone https://github.com/lolhop/vitaspotify.git
 cd vitaspotify
-```
-
-On Windows, build the auth helper (see `docs/BUILD-AUTH-HELPER.md`), copy `cspotcli.exe` to  
-`release/get-auth-json/windows/vitaspotify-auth-helper.exe`, then run  
-`release/get-auth-json/windows/Get VitaSpotify Login.bat`.
-
-## Release install (users)
-
-1. Install **[iTLS-Enso](https://github.com/CelesteBlue-dev/ITLS-Enso)** on your Vita.
-2. Install **`vitaspotify.vpk`** on the console.
-3. Unzip **`VitaSpotify-auth-helper.zip`** on your computer (Mac / Linux / Windows — no git, no coding).  
-   Double-click the helper for your OS → Spotify app → Connect → **CSpot player** → copy **`auth.json`** to `ux0:data/vitaspotify/`.  
-   **[Full guide: docs/AUTH.md](docs/AUTH.md)** · plain-text steps in the zip’s **README.txt**
-4. Launch **VitaSpotify** → **Log in (auth.json)**.
-
-## Vita requirements
-
-- Jailbroken PS Vita (henkaku / similar)
-- [iTLS-Enso](https://github.com/CelesteBlue-dev/ITLS-Enso) (or current TLS solution) for HTTPS
-- Spotify **Premium** account
-
-## Build (Mac or Linux / WSL)
-
-### Apple Silicon (this machine)
-
-VitaSDK is installed at **`~/vitasdk`** (no sudo). Your `~/.zshrc` already has:
-
-```bash
 export VITASDK="$HOME/vitasdk"
 export PATH="$VITASDK/bin:$PATH"
-```
-
-Open a **new terminal** (or `source ~/.zshrc`), then:
-
-```bash
-# One-time host tools (Homebrew)
-brew install cmake wget protobuf@21
-python3.13 -m pip install 'setuptools<70' 'protobuf>=3.19,<5'
-
-cd /Users/sam/vitaspotify
 ./scripts/build.sh
 ```
 
-Output: `build/vitaspotify.vpk`
+The VPK is written to:
 
-### Fresh install (any Mac)
-
-```bash
-brew install cmake wget
-git clone https://github.com/vitasdk/vdpm ~/vdpm
-export VITASDK="$HOME/vitasdk"
-export PATH="$VITASDK/bin:$PATH"
-# Download ARM64 toolchain (bootstrap Python SSL may fail on some Macs):
-mkdir -p "$VITASDK"
-curl -fL "$(curl -fsSL 'https://api.github.com/repos/vitasdk/autobuilds/releases?per_page=5' | python3 -c "
-import json,sys
-for r in json.load(sys.stdin):
-    if 'osx' in r.get('tag_name','') and r.get('assets'):
-        print(r['assets'][0]['browser_download_url']); break
-")" | tar xj -C "$VITASDK" --strip-components=1
-cd ~/vdpm && ./vdpm -f mbedtls zstd curl openssl freetype vitaGL imgui vitaShaRK taihen SceShaccCgExt libmathneon zlib
+```text
+build/vitaspotify.vpk
 ```
 
-Add the `VITASDK` lines to `~/.zshrc`, then build vitaspotify as above.
+## Auth Helper Builds
 
-See also [Vita SDK on macOS ARM](https://itspazaz.com/2026-04-26-Vita-SDK-macOS-ARM/).
-
-## Install on Vita
-
-1. Copy `vitaspotify.vpk` to the console (VitaShell USB/FTP).
-2. Install the VPK.
-3. Launch **VitaSpotify**.
-
-## Login (`auth.json`)
-
-End users: use **`VitaSpotify-auth-helper.zip`** from the release (see [docs/AUTH.md](docs/AUTH.md)).
-
-Developers packing a release:
+The release helper zip is made from `release/get-auth-json/`:
 
 ```bash
-./scripts/pack-auth-helper.sh   # → build/VitaSpotify-auth-helper.zip
+./scripts/pack-auth-helper.sh
 ```
 
-In-repo only: `./scripts/get-auth-json.sh`  
-**Example file shape:** [auth.json.example](auth.json.example)
+That produces:
 
-Logs on the Vita: `ux0:data/vitaspotify/log.txt`
+```text
+build/VitaSpotify-auth-helper.zip
+```
 
-## Controls (summary)
+Build the Windows and Linux helper binaries on those platforms and copy them into
+their release folders before packing a public release. The Windows helper build
+uses the vendored `tools/protoc/` compiler files. See
+[docs/BUILD-AUTH-HELPER.md](docs/BUILD-AUTH-HELPER.md).
 
-- **D-pad** — move highlight · **Cross** — select · **Touch** — tap controls
-- **L / R** — page lists (downloads, search results, playlists)
-- **Go offline** — disconnect Spotify and play downloaded tracks
-- **START + SELECT** — quit cleanly (preferred over swiping the LiveArea bubble closed)
+## Project Layout
 
-## Can't delete the bubble / uninstall error
+```text
+assets/                  Vita icon and UI images
+docs/                    user and release notes
+include/                 app headers
+patch/                   Vita/host patches applied to cspot/bell while building
+release/get-auth-json/   scripts shipped with the auth helper zip
+scripts/                 build and packaging scripts
+src/                     Vita app code
+third_party/cspot/       vendored Spotify Connect implementation
+third_party/debugscreen/ debug screen helper used by the app
+tools/protoc/            Windows protoc binary and protobuf include files
+```
 
-If LiveArea won't remove VitaSpotify (often after a crash or force-close), the app is probably still running or left in a bad state.
+## Troubleshooting
 
-1. **Force-stop it** — Hold **PS** → highlight VitaSpotify → **Close** (or restart the Vita).
-2. **Delete with VitaShell** (most reliable):
-   - Open **VitaShell** → `ux0:app/`
-   - Find folder **`VSPOT0001`**
-   - **Triangle** → **Delete**
-   - If you installed to a memory card, also check `imc0:app/VSPOT0001`
-3. **Refresh LiveArea** — Reboot the Vita. The bubble should be gone.
-4. **Optional cleanup** (does not remove the bubble by itself):
-   - `ux0:data/vitaspotify/` — saved login and logs
+If the LiveArea bubble will not delete after a crash, close VitaSpotify from the
+PS button menu or reboot the Vita, then delete `ux0:app/VSPOT0001` with
+VitaShell. Saved login and log data lives in `ux0:data/vitaspotify/`.
 
-Then install the latest `vitaspotify.vpk` again. Newer builds use **START+SELECT** to quit cleanly, which helps avoid this.
+If login fails, check the file path first. It must be exactly:
 
-If deletion still fails, note the **exact error text** (or error code like `C2-…`) and whether the folder exists in `ux0:app/`.
+```text
+ux0:data/vitaspotify/auth.json
+```
 
-## Project layout
+If `CSpot player` never appears in Spotify, make sure the computer running the
+helper and the phone or desktop Spotify app are on the same Wi-Fi, then disable
+VPNs or firewall rules that block local device discovery.
 
-| Path | Purpose |
-|------|---------|
-| `src/` | Vita app (text UI, audio, API) |
-| `third_party/cspot/` | Spotify Connect core (git submodule) |
-| `patch/Queue.h` | Vita-safe bell queue (applied at configure time) |
-| `assets/` | Icon, UI artwork |
-| `docs/AUTH.md` | User guide for creating `auth.json` |
-| `scripts/get-auth-json.sh` | One-command `auth.json` generator (Mac/Linux) |
+## Open Source Notes
 
-## Roadmap
+No real Spotify credentials are checked into this repo. `auth.json` and
+`dev_login.txt` are ignored on purpose.
 
-- [x] `auth.json` login via PC helper script
-- [x] Liked Songs / playlists / search
-- [x] Offline downloads
-- [ ] CJK font support for track titles
+The app code in this repository is MIT licensed. VitaSpotify also vendors cspot,
+which is GPLv3. If you distribute builds that include cspot, make sure you follow
+the GPLv3 requirements for that combined binary.
 
-## License
+VitaSpotify is not affiliated with Spotify.
 
-App code: MIT (see LICENSE). `third_party/cspot` follows its own license. Not affiliated with Spotify.
+AI tools were used while writing and debugging the code. No generative AI was used for assets.

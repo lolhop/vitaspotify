@@ -33,14 +33,20 @@ Copy Windows/Linux helpers into the folders above first, then re-run pack if you
 
 ## Mac (Apple Silicon)
 
-Handled by `./scripts/pack-auth-helper.sh` on a Mac.
+Handled by `./scripts/pack-auth-helper.sh` on a Mac. Install the host tools
+first:
+
+```bash
+brew install cmake portaudio protobuf@21
+python3 -m pip install 'protobuf>=3.19,<5'
+```
 
 ---
 
 ## Linux
 
 ```bash
-sudo apt install build-essential cmake libportaudio2 libportaudio-dev protobuf-compiler
+sudo apt install build-essential cmake libportaudio2 libportaudio-dev protobuf-compiler python3-protobuf
 cd vitaspotify
 git submodule update --init third_party/cspot
 mkdir -p build-host && cd build-host

@@ -11,6 +11,20 @@ QUEUE_H="$ROOT/third_party/cspot/cspot/bell/main/utilities/include/Queue.h"
 TCPSOCKET_H="$ROOT/third_party/cspot/cspot/bell/main/io/include/TCPSocket.h"
 BELL_DIR="$ROOT/third_party/cspot/cspot/bell"
 
+prefer_python_with_protobuf() {
+  local candidate path dir
+  for candidate in python3 /Library/Frameworks/Python.framework/Versions/3.13/bin/python3 /usr/local/bin/python3 /opt/homebrew/bin/python3 /usr/bin/python3; do
+    path="$(command -v "$candidate" 2>/dev/null || true)"
+    if [[ -n "$path" ]] && "$path" -c 'import google.protobuf' >/dev/null 2>&1; then
+      dir="$(dirname "$path")"
+      export PATH="$dir:$PATH"
+      return 0
+    fi
+  done
+  echo "Python protobuf package not found. Install it with: python3 -m pip install 'protobuf>=3.19,<5'" >&2
+  exit 1
+}
+
 restore_host_cspot_headers() {
   git -C "$BELL_DIR" show HEAD:main/utilities/include/Queue.h >"$QUEUE_H"
   git -C "$BELL_DIR" show HEAD:main/io/include/TCPSocket.h >"$TCPSOCKET_H"
@@ -29,8 +43,15 @@ ensure_host_deps() {
     fi
     brew list portaudio >/dev/null 2>&1 || brew install portaudio
     brew list cmake >/dev/null 2>&1 || brew install cmake
-    export PATH="/opt/homebrew/opt/protobuf@21/bin:/opt/homebrew/bin:${PATH:-}"
-    export PROTOC="${PROTOC:-/opt/homebrew/opt/protobuf@21/bin/protoc}"
+    if [[ -d "/opt/homebrew/opt/protobuf@21/bin" ]]; then
+      export PATH="/opt/homebrew/opt/protobuf@21/bin:${PATH:-}"
+    fi
+    if [[ -d "/opt/homebrew/bin" ]]; then
+      export PATH="/opt/homebrew/bin:${PATH:-}"
+    fi
+    if [[ -z "${PROTOC:-}" && -x "/opt/homebrew/opt/protobuf@21/bin/protoc" ]]; then
+      export PROTOC="/opt/homebrew/opt/protobuf@21/bin/protoc"
+    fi
   else
     for cmd in cmake make protoc pkg-config; do
       if ! command -v "$cmd" >/dev/null 2>&1; then
@@ -43,6 +64,7 @@ ensure_host_deps() {
       exit 1
     fi
   fi
+  prefer_python_with_protobuf
 }
 
 build_cspotcli() {
