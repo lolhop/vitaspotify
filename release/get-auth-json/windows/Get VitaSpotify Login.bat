@@ -3,7 +3,7 @@ setlocal EnableExtensions
 
 set "DIR=%~dp0"
 set "HELPER=%DIR%vitaspotify-auth-helper.exe"
-set "OUT=%USERPROFILE%\Desktop\vitaspotify auth.json"
+for /f "delims=" %%D in ('powershell -NoProfile -Command "[Environment]::GetFolderPath('Desktop')"') do set "OUT=%%D\vitaspotify auth.json"
 
 cls
 echo.
@@ -35,6 +35,8 @@ echo   2. Open Spotify on your phone (same Wi-Fi as this PC).
 echo   3. Play any song - tap Connect to a device (speaker icon).
 echo   4. Choose:  CSpot player
 echo   5. Wait until you see SUCCESS below (may take 10-30 seconds).
+echo.
+echo IMPORTANT: Use this .bat file, not the .exe directly.
 echo.
 echo Starting helper...
 echo.

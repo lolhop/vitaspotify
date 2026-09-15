@@ -19,6 +19,7 @@
 #include "nlohmann/json_fwd.hpp"  // for json
 #ifdef _WIN32
 #include <winsock2.h>
+#include <shlobj.h>
 #endif
 #include <iostream>  // for operator<<, cout, ostream, basic_o...
 #include <memory>    // for shared_ptr, make_shared, unique_ptr
@@ -137,6 +138,24 @@ int main(int argc, char** argv) {
 
   try {
     auto args = CommandLineArguments::parse(argc, argv);
+    bool needsCredentialSave = false;
+
+#ifdef _WIN32
+    // Double-clicking the auth helper exe: default to Desktop output path.
+    if (args->credentials.empty() && !args->shouldShowHelp &&
+        args->username.empty()) {
+      char desktopPath[MAX_PATH];
+      if (SUCCEEDED(
+              SHGetFolderPathA(NULL, CSIDL_DESKTOPDIRECTORY, NULL, 0,
+                               desktopPath))) {
+        args->credentials = std::string(desktopPath) + "\\vitaspotify auth.json";
+        needsCredentialSave = true;
+        std::cout << "Writing credentials to: " << args->credentials
+                  << std::endl;
+      }
+    }
+#endif
+
     if (args->shouldShowHelp) {
       std::cout << "Usage: cspotcli [OPTION]...\n";
       std::cout << "Emulate a Spotify connect speaker.\n";
@@ -175,6 +194,7 @@ int main(int argc, char** argv) {
           loginBlob->loadJson(credentials.str());
           loggedInSemaphore->give();
         } else {
+          needsCredentialSave = true;
           zeroconfServer->blob = loginBlob;
           zeroconfServer->onAuthSuccess = [loggedInSemaphore]() {
             loggedInSemaphore->give();
@@ -182,7 +202,7 @@ int main(int argc, char** argv) {
           zeroconfServer->registerHandlers();
         }
     }
-    // ZeroconfAuthenticator
+    // ZeroconfAuthenticator (no -c flag)
     else {
       zeroconfServer->blob = loginBlob;
       zeroconfServer->onAuthSuccess = [loggedInSemaphore]() {
@@ -206,6 +226,33 @@ int main(int argc, char** argv) {
 
     // Auth successful
     if (ctx->config.authData.size() > 0) {
+      // Auth helper: save fresh zeroconf login and exit (no playback loop).
+      if (needsCredentialSave && !args->credentials.empty()) {
+        std::ofstream file(args->credentials, std::ios::trunc);
+        if (!file) {
+          std::cout << "ERROR: could not write credentials to "
+                    << args->credentials << std::endl;
+          return 1;
+        }
+        file << ctx->getCredentialsJson();
+        file.flush();
+        if (!file.good()) {
+          std::cout << "ERROR: failed to save credentials to "
+                    << args->credentials << std::endl;
+          return 1;
+        }
+        std::cout << std::endl
+                  << "==============================================" << std::endl
+                  << "  SUCCESS" << std::endl
+                  << "==============================================" << std::endl
+                  << std::endl
+                  << "Created: " << args->credentials << std::endl
+                  << std::endl
+                  << "Copy to your PS Vita as: ux0:data/vitaspotify/auth.json"
+                  << std::endl;
+        return 0;
+      }
+
       // when credentials file is set, then store reusable credentials
       if (!args->credentials.empty()) {
           std::ofstream file(args->credentials);

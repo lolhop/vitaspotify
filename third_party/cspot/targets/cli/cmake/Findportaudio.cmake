@@ -1,4 +1,6 @@
-#  PORTAUDIO_FOUND - system has libportaudio
-#  PORTAUDIO_INCLUDE_DIRS - the libportaudio include directory
-#  PORTAUDIO_LIBRARIES - Link these to use libportaudio
-message(STATUS "DON'T USE THIS")
+find_package(portaudio CONFIG REQUIRED)
+if(TARGET portaudio::portaudio)
+  get_target_property(PORTAUDIO_INCLUDE_DIRS portaudio::portaudio INTERFACE_INCLUDE_DIRECTORIES)
+  set(PORTAUDIO_LIBRARIES portaudio::portaudio)
+  set(PORTAUDIO_FOUND TRUE)
+endif()
